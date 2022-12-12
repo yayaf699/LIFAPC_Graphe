@@ -64,25 +64,6 @@ int Graphe::voisin(int indice, Direction dir) const{
     }
 }
 
-bool Graphe::voisin_existe(int indice, Direction dir) const{
-    switch(dir){
-
-        case 0: //Est
-            return indice%C < C - 1;
-
-        case 1: //Nord
-            return indice >= C;
-
-        case 2: //Ouest
-            return (indice-1)%C > 0 && (indice-1)%C < indice%C;
-
-        case 3: //Sud
-            return indice + C <= L*C - 1;
-
-        default:
-            return false;
-    }
-}
 
 void Graphe::afficher() const{
     for(int i = 0; i < L; i++){
@@ -93,10 +74,8 @@ void Graphe::afficher() const{
     }
 }
 
-std::vector<int>dijkstra(Graphe g, int departs){
+std::vector<double>dijkstra(Graphe g, int depart){
 
-    std::vector<int>tabDeparts;
-    tabDeparts.push_back(rand()%g.getLC());
     std::vector<int>precedent(g.getLC());
     std::vector<double>distance(g.getLC());
     std::vector<bool>visite(g.getLC(), false);
@@ -107,32 +86,57 @@ std::vector<int>dijkstra(Graphe g, int departs){
         precedent[i] = i;
         distance[i] = -1;
     }
-    std::priority_queue<int>fp;
     
-    for(auto i: tabDeparts){
-    distance[i] = 0;
-    fp.push(i);
-    }
+    
+        std::priority_queue<int>fp;
+        distance[depart] = 0;
+        visite[depart] = true;
+        fp.push(depart);
 
-    while(!fp.empty()){
-        n = fp.top();
-        fp.pop();
-        for(int i = 0; i < 4; ++i){
-            v = g.voisin(n, (Direction)(i));
-            if(v != -1 && visite[v] == false){
-                visite[v] = true;
-                dv = distance[v];
-                dn = distance[n];
-                dnv = dn + sqrt(pow(g.altitude(n)-g.altitude(v), 2) + 1);
-                if(precedent[v] == v || dnv < dv){
-                    std::cout << n << "  " << v << "  " << dn << " " << dv << " " << dnv << std::endl;
-                    precedent[v] = n;
-                    distance[v] = dnv;
-                    fp.push(v);
+        while(!fp.empty()){
+            n = fp.top();
+            fp.pop();
+            for(int i = 0; i < 4; ++i){
+                v = g.voisin(n, (Direction)(i));
+                if(v != -1 && visite[v] == false){
+                    visite[v] = true;
+                    dv = distance[v];
+                    dn = distance[n];
+                    dnv = dn + sqrt(pow(g.altitude(n)-g.altitude(v), 2) + 1);
+                    if(precedent[v] == v || dnv < dv){
+                        precedent[v] = n;
+                        distance[v] = dnv;
+                        fp.push(v);
+                    }
                 }
             }
         }
+    return distance;
+    
+}
+
+std::vector<int> voronoi(Graphe g, int nb_departs){
+    assert(nb_departs < g.getLC());
+
+    std::vector<std::vector<double>>d;
+    for(int i = 0; i < nb_departs; ++i)
+    d.push_back(dijkstra(g, rand()%g.getLC()));
+
+    std::vector<int>res(g.getLC(), 0);
+
+    for(int i = 1; i < nb_departs; ++i){
+        for(int j = 0; j < g.getLC(); ++j){
+            res[j] = d[i][j] < d[res[j]][j] ? i : res[j];
+        }
     }
 
-    
+    for(int i = 0; i < g.L; ++i){
+        for(int j = 0; j < g.C; ++j){
+            std::cout << res[i] << "  ";
+        }
+        std::cout << std::endl;
+    }
+
+
+    return res;
 }

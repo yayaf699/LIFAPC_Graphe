@@ -6,13 +6,16 @@ int main(int argc, char ** argv){
 
     srand(time(NULL));
 
-    int departs = 1;
-    if(argv[1] == nullptr) exit(EXIT_FAILURE);
-    Graphe g(argv[1]);
-    std::cout << argv[1] << std::endl;
+    // if(argv[1] == nullptr) {
+    //     std::cout << "il manque des arguments pour que le programme fonctionne," << std::endl
+    //     << "SVP regardez le README.md" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
+    Graphe g("carte.txt");
+    // std::cout << argv[1] << std::endl;
     g.afficher();
 
-    dijkstra(g, departs);
+    voronoi(g, 76);
 
     
     return 0;

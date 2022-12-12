@@ -51,8 +51,6 @@ public:
 
     int voisin(int indice, Direction dir) const;
 
-    bool voisin_existe(int indice, Direction dir) const;
-
     void afficher() const;
 
 
@@ -61,7 +59,9 @@ public:
 
 
 
-std::vector<int> dijkstra(Graphe g, int departs);
+std::vector<double> dijkstra(Graphe g, int departs);
+
+std::vector<int> voronoi(Graphe g, int nb_departs);
 
 
 #endif
