@@ -16,6 +16,12 @@ struct N_D{
     N_D(int _prec, int _dist): precedent(_prec), distance(_dist){}
 };
 
+struct Color{
+    unsigned char r, g, b;
+
+    Color(unsigned char _r, unsigned char _g, unsigned char _b): r(_r), g(_g), b(_b){}
+};
+
 class Graphe{
 
     private:
@@ -55,6 +61,7 @@ public:
 
 
 
-void dijkstra(Graphe g, int depart);
+std::vector<int> dijkstra(Graphe g, int departs);
+
 
 #endif

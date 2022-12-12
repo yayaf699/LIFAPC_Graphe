@@ -45,18 +45,18 @@ int Graphe::voisin(int indice, Direction dir) const{
     switch (dir)
     {
     case 0: //Est
-        return indice%C < C - 1 ? indice++ : -1;
+        return (indice+1)%C != 0 ? indice + 1 : -1;
         break;
     case 1: //Nord
         return indice >= C ? indice - C : -1;
         break;
     
     case 2: // Ouest
-        return (indice-1)%C > 0 && (indice-1)%C < indice%C ? indice - 1 : -1;
+        return (indice+1)%C != 1 ? indice - 1 : -1;
         break;
     
     case 3: // Sud
-        return indice + C <= L*C - 1 ? indice + C : -1;
+        return indice <= L*(C - 1) ? indice + C : -1;
         break;
     
     default:
@@ -93,8 +93,10 @@ void Graphe::afficher() const{
     }
 }
 
-void dijkstra(Graphe g, int depart){
+std::vector<int>dijkstra(Graphe g, int departs){
 
+    std::vector<int>tabDeparts;
+    tabDeparts.push_back(rand()%g.getLC());
     std::vector<int>precedent(g.getLC());
     std::vector<double>distance(g.getLC());
     std::vector<bool>visite(g.getLC(), false);
@@ -105,15 +107,16 @@ void dijkstra(Graphe g, int depart){
         precedent[i] = i;
         distance[i] = -1;
     }
-
-    distance[depart] = 0;
     std::priority_queue<int>fp;
-    fp.push(depart);
-    visite[depart] = true;
+    
+    for(auto i: tabDeparts){
+    distance[i] = 0;
+    fp.push(i);
+    }
 
     while(!fp.empty()){
         n = fp.top();
-
+        fp.pop();
         for(int i = 0; i < 4; ++i){
             v = g.voisin(n, (Direction)(i));
             if(v != -1 && visite[v] == false){
@@ -129,7 +132,6 @@ void dijkstra(Graphe g, int depart){
                 }
             }
         }
-        fp.pop();
     }
 
     
