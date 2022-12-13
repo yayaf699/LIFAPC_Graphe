@@ -5,19 +5,28 @@
 
 enum Direction {EST = 0, NORD = 1, OUEST = 2, SUD = 3};
 
-struct N_D{
-    int precedent;
-    double distance;
-
-    bool operator<(const N_D& n) const{
-        return this->distance < n.distance;
+struct N_D
+    {
+        int noeud;
+        int precedent;
+        double distance;
+        bool operator<(const N_D& truc) const{
+            return this->distance<truc.distance;
         }
 
-    N_D(int _prec, int _dist): precedent(_prec), distance(_dist){}
+        bool operator>(const N_D& truc) const{
+            return this->distance>truc.distance;
+        }
+        
+    };
+
+struct Coordonnees{
+    int x, y;
+
 };
 
 struct Color{
-    unsigned char r, g, b;
+    int r, g, b;
 
     Color(unsigned char _r, unsigned char _g, unsigned char _b): r(_r), g(_g), b(_b){}
 };
@@ -41,6 +50,10 @@ public:
 
     int getLC() const;
 
+    int getL() const;
+
+    int getC() const;
+
     int altitude(int indice) const;
 
     int indice(unsigned int i, unsigned int j) const;
@@ -57,11 +70,17 @@ public:
 };
 
 
+std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>departs);
 
+void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c);
 
-std::vector<double> dijkstra(Graphe g, int departs);
+void afficher_grille_res_txt(std::vector<int> res);
 
-std::vector<int> voronoi(Graphe g, int nb_departs);
+void sauver_fichier_img(const char* filename, Graphe g,std::vector<int>ind, std::vector<Color> c);
+
+void sauver_fichier_txt(Graphe g, const char* filename, std::vector<int> res);
+
+void recupere_coordonnees(const char* filename, std::vector<Coordonnees>&c);
 
 
 #endif
