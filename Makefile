@@ -14,4 +14,4 @@ obj/Graphe.o: src/Graphe.cpp src/Graphe.h
 	$(CC) $(CFLAGS) -o $@ -c src/Graphe.cpp
 
 clean:
-	rm bin/main obj/*.o
+	rm bin/main obj/*.o data/voronoi.* data/voronoiLivraison.*

@@ -91,58 +91,71 @@ void Graphe::afficher() const{
     }
 }
 
+/**
+ * @brief Fonction qui retourne un tableau (de tableau) resultat dans lequel il y a à chaque case pour tous les points de
+ * départ la distance minimale entre un point de la grille et le départ selon l'algo de Djikstra 
+ * 
+ * @param g le graphe
+ * @return std::vector<std::vector<double>> /tableau resultat
+ */
 std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>departs){
 
-    std::vector<std::vector<double>> res;
-    std::vector<int>precedent(g.getLC());
-    std::vector<double>distance(g.getLC());
-    int n;
-    int v, dv, dn, dnv;
+    std::vector<std::vector<double>> res;   //resultat
+    std::vector<int>precedent(g.getLC());   //tableau des précédents de chaque points 
+    std::vector<double>distance(g.getLC()); //tableau de distance de chaque points (par rapport à un point de départ)
+    int n; // numero d'un point de la grille 
+    int dv, dn, dnv;//les distance pour aller à v (voisin de n), à n et la distance de n à v 
+    N_D v;// structure qui va rentrer dans la file un voisin de n 
 
-    std::priority_queue<int>fp;
+    std::priority_queue<N_D>fp;// 
 
-    for(int l = 0; l < (int)departs.size(); ++l) {
-        for(int i = 0; i < g.getLC(); ++i){
+    for(int l = 0; l < (int)departs.size(); ++l) { // init du tableau de toutes les cases des précedents de chaque point 
+        for(int i = 0; i < g.getLC(); ++i){        // et du tableau de distance pour y arriver init à -1 si on n'a pas encore sa distance pour y arriver
             precedent[i] = i;
             distance[i] = -1;
         }
-        int indice_depart = g.indice(departs[l].x, departs[l].y);
+        N_D indice_depart;// 
+        indice_depart.noeud = g.indice(departs[l].x, departs[l].y);//convert en indice grace aux coordonnées pour retrouver les points (l => librairie)
+        indice_depart.distance=0;
 
         std::vector<bool>visite(g.getLC(), false);
-
-        std::cout << indice_depart << ": pt de depart" << std::endl;
         
-        distance[indice_depart] = 0;
-        visite[indice_depart] = true;
+        distance[indice_depart.noeud] = 0;
+        visite[indice_depart.noeud] = true;
         fp.push(indice_depart);
 
         while(!fp.empty()){
-            n = fp.top();
+            n = fp.top().noeud;
             fp.pop();
             for(int i = 0; i < 4; ++i){
-                v = g.voisin(n, (Direction)(i));
-                if(v != -1 && visite[v] == false){
-                    visite[v] = true;
-                    dv = distance[v];
+                v.noeud = g.voisin(n, (Direction)(i)); //on visite les 4 cotes
+                if(v.noeud != -1 && visite[v.noeud] == false){ //si le voisin existe et que le noeud n est pas visite
+                    visite[v.noeud] = true;
+                    dv = distance[v.noeud];
                     dn = distance[n];
-                    dnv = dn + sqrt(pow(g.altitude(n)-g.altitude(v), 2) + 1);
-                    if(precedent[v] == v || dnv < dv){
-                        std::cout << n << " " << v << " " << dn << " " << dv << " " << dnv << std::endl;
-                        precedent[v] = n;
-                        distance[v] = dnv;
+                    dnv = dn + sqrt(pow(g.altitude(n)-g.altitude(v.noeud), 2) + 1);
+                    if(precedent[v.noeud] == v.noeud || dnv < dv){
+                        precedent[v.noeud] = n;
+                        distance[v.noeud] = dnv;
+                        v.distance =dnv;
                         fp.push(v);
                     }
                 }
             }
         }
 
-        res.push_back(distance);
+        res.push_back(distance); //un push les distances de chaque librairies
     }
     return res;
     
 }
 
-
+/**
+ * @brief reproduction du diagramme de voronoi en utilisant le tableau de distances
+ * @brief obtenu apres avoir lance l'algorithme de dijkstra
+ * 
+ * 
+ */
 void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c){
     int taille_tab = (int)distances.size();
     assert(taille_tab < g.getLC());    
@@ -151,15 +164,9 @@ void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Co
     for(int i = 1; i < taille_tab; ++i){
         for(int j = 0; j < g.getLC(); ++j){
             res[j] = distances[i][j] < distances[res[j]][j] ? i : res[j];
+            //on ecrit l'indice de la librairie la plus proche pour chaque case de la grille
         }
     }
-
-    // for(int j = 0; j < g.C; ++j){
-    //     for(int i = 0; i < g.L; ++i){
-    //         std::cout << res[g.indice(i, j)] << "  ";
-    //     }
-    //     std::cout << std::endl;
-    // }
     
     sauver_fichier_img("data/voronoi.ppm", g, res, c);
 
@@ -168,6 +175,12 @@ void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Co
 
 }
 
+
+/**
+ * @brief meme fonction que voronoi sauf qu'on multiplie un cout (fixe aleatoirement entre 6 et 12 et different pour chaque librairies)
+ * @brief puis creation du diagramme
+ * 
+ */
 void voronoiLivraison(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c){
     int taille_tab = (int)distances.size();
     assert(taille_tab < g.getLC());    
@@ -177,7 +190,7 @@ void voronoiLivraison(Graphe g, std::vector<std::vector<double>>distances, std::
 
     for(int i = 0; i < taille_tab; ++i){
         cout = (rand()%(120-60+10)+60)/10.0;
-        std::cout << cout << std::endl;
+        std::cout << "cout de la librairie " << i+1 << " : " << cout << std::endl;
         for(int j = 0; j < g.getLC(); ++j){
             distances[i][j]*=cout;
         }
@@ -189,12 +202,6 @@ void voronoiLivraison(Graphe g, std::vector<std::vector<double>>distances, std::
         }
     }
 
-    // for(int j = 0; j < g.C; ++j){
-    //     for(int i = 0; i < g.L; ++i){
-    //         std::cout << res[g.indice(i, j)] << "  ";
-    //     }
-    //     std::cout << std::endl;
-    // }
     
     sauver_fichier_img("data/voronoiLivraison.ppm", g, res, c);
 
@@ -212,9 +219,6 @@ void afficher_grille_res_txt(Graphe g, std::vector<int> res){
     }
 }
 
-void afficher_grille_res_clr(Graphe g, std::vector<int> res, std::vector<Color>){
-    
-}
 
 void sauver_fichier_txt(Graphe g, const char* filename, std::vector<int> res){
     std::ofstream fichier(filename);
@@ -227,6 +231,9 @@ void sauver_fichier_txt(Graphe g, const char* filename, std::vector<int> res){
         }
         fichier << std::endl;
     }
+
+    std::cout << "Sauvegarde du fichier " << filename << " ... OK\n";
+    fichier.close();
 }
 
 void sauver_fichier_img(const char* filename, Graphe g,std::vector<int>ind, std::vector<Color> c)  {
