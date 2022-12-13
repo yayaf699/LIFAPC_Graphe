@@ -8,7 +8,6 @@ enum Direction {EST = 0, NORD = 1, OUEST = 2, SUD = 3};
 struct N_D
     {
         int noeud;
-        int precedent;
         double distance;
         bool operator<(const N_D& truc) const{
             return this->distance<truc.distance;
@@ -28,7 +27,7 @@ struct Coordonnees{
 struct Color{
     int r, g, b;
 
-    Color(unsigned char _r, unsigned char _g, unsigned char _b): r(_r), g(_g), b(_b){}
+    Color(int _r, int _g, int _b): r(_r), g(_g), b(_b){}
 };
 
 class Graphe{
@@ -73,6 +72,8 @@ public:
 std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>departs);
 
 void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c);
+
+void voronoiLivraison(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c);
 
 void afficher_grille_res_txt(std::vector<int> res);
 

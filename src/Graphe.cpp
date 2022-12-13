@@ -19,7 +19,6 @@ Graphe::Graphe(const char* file){
     std::ifstream fichier(file); 
     fichier >> L >> C;
     for(int i = 0; i < L*C; ++i) Terrain.push_back(0);
-    int val;
     for(int j = 0; j < C; ++j){
         for(int i = 0; i < L; ++i){
             fichier >> Terrain[indice(i, j)];
@@ -100,8 +99,9 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
     int n;
     int v, dv, dn, dnv;
 
-    
-    for(int l = 0; l < departs.size(); ++l) {
+    std::priority_queue<int>fp;
+
+    for(int l = 0; l < (int)departs.size(); ++l) {
         for(int i = 0; i < g.getLC(); ++i){
             precedent[i] = i;
             distance[i] = -1;
@@ -112,8 +112,7 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
 
         std::cout << indice_depart << ": pt de depart" << std::endl;
         
-        std::priority_queue<int, std::vector<int>, std::less<int>>fp;
-        distance[indice_depart] = INFINITY;
+        distance[indice_depart] = 0;
         visite[indice_depart] = true;
         fp.push(indice_depart);
 
@@ -128,7 +127,7 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
                     dn = distance[n];
                     dnv = dn + sqrt(pow(g.altitude(n)-g.altitude(v), 2) + 1);
                     if(precedent[v] == v || dnv < dv){
-                        //std::cout << n << " " << v << " " << dn << " " << dv << " " << dnv << std::endl;
+                        std::cout << n << " " << v << " " << dn << " " << dv << " " << dnv << std::endl;
                         precedent[v] = n;
                         distance[v] = dnv;
                         fp.push(v);
@@ -136,6 +135,7 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
                 }
             }
         }
+
         res.push_back(distance);
     }
     return res;
@@ -154,16 +154,51 @@ void voronoi(Graphe g, std::vector<std::vector<double>>distances, std::vector<Co
         }
     }
 
-    for(int j = 0; j < g.C; ++j){
-        for(int i = 0; i < g.L; ++i){
-            std::cout << res[g.indice(i, j)] << "  ";
-        }
-        std::cout << std::endl;
-    }
+    // for(int j = 0; j < g.C; ++j){
+    //     for(int i = 0; i < g.L; ++i){
+    //         std::cout << res[g.indice(i, j)] << "  ";
+    //     }
+    //     std::cout << std::endl;
+    // }
     
     sauver_fichier_img("data/voronoi.ppm", g, res, c);
 
-    //sauver_fichier_txt(g, "data/voronoi.txt", res);
+    sauver_fichier_txt(g, "data/voronoi.txt", res);
+
+
+}
+
+void voronoiLivraison(Graphe g, std::vector<std::vector<double>>distances, std::vector<Color>c){
+    int taille_tab = (int)distances.size();
+    assert(taille_tab < g.getLC());    
+    std::vector<int>res(g.getLC(), 0);
+
+    float cout;
+
+    for(int i = 0; i < taille_tab; ++i){
+        cout = (rand()%(120-60+10)+60)/10.0;
+        std::cout << cout << std::endl;
+        for(int j = 0; j < g.getLC(); ++j){
+            distances[i][j]*=cout;
+        }
+    }
+
+    for(int i = 1; i < taille_tab; ++i){
+        for(int j = 0; j < g.getLC(); ++j){
+            res[j] = distances[i][j] < distances[res[j]][j] ? i : res[j];
+        }
+    }
+
+    // for(int j = 0; j < g.C; ++j){
+    //     for(int i = 0; i < g.L; ++i){
+    //         std::cout << res[g.indice(i, j)] << "  ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    
+    sauver_fichier_img("data/voronoiLivraison.ppm", g, res, c);
+
+    sauver_fichier_txt(g, "data/voronoiLivraison.txt", res);
 
 
 }
@@ -178,7 +213,7 @@ void afficher_grille_res_txt(Graphe g, std::vector<int> res){
 }
 
 void afficher_grille_res_clr(Graphe g, std::vector<int> res, std::vector<Color>){
-
+    
 }
 
 void sauver_fichier_txt(Graphe g, const char* filename, std::vector<int> res){
@@ -188,9 +223,9 @@ void sauver_fichier_txt(Graphe g, const char* filename, std::vector<int> res){
 
     for(int j = 0; j < g.C; ++j){
         for(int i = 0; i < g.L; ++i){
-            std::cout << res[g.indice(i, j)] << "  ";
+            fichier << res[g.indice(i, j)] << "  ";
         }
-        std::cout << std::endl;
+        fichier << std::endl;
     }
 }
 

@@ -14,20 +14,23 @@ int main(int argc, char ** argv){
     //     << "SVP regardez le README.md" << std::endl;
     //     exit(EXIT_FAILURE);
     // }
-    Graphe g("carte.txt");
+    Graphe g("test.txt");
     // std::cout << "Graphe recupere depuis " << argv[1] << std::endl;
 
     std::cout << "Graphe initial :" << std::endl;
     g.afficher();
 
     recupere_coordonnees("coordtest.txt", co);
-    for(int i = 0; i < co.size(); ++i){
-        couleurs.push_back({rand()%255, rand()%255, rand()%255});
+    for(int i = 0; i < (int)co.size(); ++i){
+        couleurs.push_back({rand()%256, rand()%256, rand()%256});
     }
 
     distances = dijkstra(g, co);
     
-    voronoi(g, distances, couleurs);                   
+    voronoi(g, distances, couleurs); 
+
+
+    voronoiLivraison(g, distances, couleurs);                  
 
     
     return 0;
