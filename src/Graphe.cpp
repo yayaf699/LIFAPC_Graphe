@@ -107,7 +107,7 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
     int dv, dn, dnv;//les distance pour aller à v (voisin de n), à n et la distance de n à v 
     N_D v;// structure qui va rentrer dans la file un voisin de n 
 
-    std::priority_queue<N_D>fp;// 
+    std::priority_queue<N_D, std::vector<N_D>, std::greater<N_D>>fp;// 
 
     for(int l = 0; l < (int)departs.size(); ++l) { // init du tableau de toutes les cases des précedents de chaque point 
         for(int i = 0; i < g.getLC(); ++i){        // et du tableau de distance pour y arriver init à -1 si on n'a pas encore sa distance pour y arriver

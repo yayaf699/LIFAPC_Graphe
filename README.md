@@ -13,7 +13,8 @@
 ### Comment lancer le programme?
 
 Il faut tout d'abord lancer la commande 
-```
+
+```$
 make
  ```
 
