@@ -129,7 +129,7 @@ std::vector<std::vector<double>> dijkstra(Graphe g, std::vector<Coordonnees>depa
             fp.pop();
             for(int i = 0; i < 4; ++i){
                 v.noeud = g.voisin(n, (Direction)(i)); //on visite les 4 cotes
-                if(v.noeud != -1 && visite[v.noeud] == false){ //si le voisin existe et que le noeud n est pas visite
+                if(v.noeud != -1 /*&& visite[v.noeud] == false*/){ //si le voisin existe et que le noeud n est pas visite
                     visite[v.noeud] = true;
                     dv = distance[v.noeud];
                     dn = distance[n];
